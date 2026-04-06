@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import Papa from "papaparse";
+import * as Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { 
