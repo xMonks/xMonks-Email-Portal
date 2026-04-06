@@ -185,7 +185,7 @@ async function startServer() {
   });
 
   app.post("/api/send-email", async (req, res) => {
-    const { clientName, clientEmail, companyName, isTest } = req.body;
+    const { clientName, clientEmail, companyName, isTest, variation } = req.body;
 
     if (!clientName || !clientEmail) {
       return res.status(400).json({ error: "Client name and email are required." });
@@ -194,12 +194,14 @@ async function startServer() {
     const senderEmail = process.env.GMAIL_USER || "marketing@xmonks.com";
     const senderName = senderEmail.split('@')[0].split('.').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-    const subject = `Helping ${companyName || "[Company Name]"} Build Stronger Leaders | xMonks`;
+    const subjectV1 = `Helping ${companyName || "[Company Name]"} Build Stronger Leaders | xMonks`;
+    const subjectV2 = `Leadership Development at ${companyName || "[Company Name]"}, A Quick Thought | xMonks`;
+    const subject = variation === 'v2' ? subjectV2 : subjectV1;
     const finalSubject = isTest ? `[TEST] ${subject}` : subject;
 
     const firstName = clientName ? clientName.split(" ")[0] : "[First Name]";
 
-    const emailHtml = `
+    const emailHtmlV1 = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -320,6 +322,132 @@ async function startServer() {
 </body>
 </html>
     `;
+
+    const emailHtmlV2 = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>xMonks Outreach</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+          <tr>
+            <td style="background-color: #1e293b; padding: 40px 30px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">xMonks</h1>
+              <p style="color: #94a3b8; margin: 10px 0 0 0; font-size: 16px;">Building Stronger Leaders</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 40px 30px;">
+              <p style="margin: 0 0 20px 0; font-size: 18px; color: #0f172a; font-weight: 600;">Hi ${firstName},</p>
+              
+              <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #334155;">
+                Most leadership programs focus on content delivery. The ones that actually shift behaviour do something different; they build the capability to lead, not just the knowledge of it.
+              </p>
+              
+              <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #334155;">
+                That's the core of what we do at xMonks. We partner with HR and L&D leaders to design leadership journeys that drive measurable change across teams, not just in the training room.
+              </p>
+
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
+                <tr>
+                  <td style="background-color: #fff7ed; border-left: 4px solid #ea580c; padding: 20px; border-radius: 0 8px 8px 0;">
+                    <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #9a3412;">
+                      Organisations like <strong>Bosch, Tata Steel, Flipkart, PUMA, and ICICI Lombard</strong> have used our ecosystem approach, combining globally accredited coach training (Erickson, The Leadership Circle, David Clutterbuck/CMI) with bespoke interventions to strengthen leadership capability at scale.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #334155;">
+                I'd love to learn about <strong>${companyName || "[Company Name]"}</strong>'s current leadership priorities and share how we might contribute. Would a 20-minute call this week or next work for you?
+              </p>
+
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 40px;">
+                <tr>
+                  <td align="center">
+                    <a href="https://calendly.com/shubhankar-sethi-xmonks/30min" style="display: inline-block; background-color: #ea580c; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; padding: 14px 32px; border-radius: 8px; text-align: center;">
+                      Let's Connect for 20 Mins
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="border-top: 1px solid #e2e8f0; padding-top: 30px;"></td>
+                </tr>
+              </table>
+
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td width="50%" valign="top" style="padding-right: 15px;">
+                    <p style="margin: 0 0 8px 0; font-size: 15px; color: #64748b;">Warm regards,</p>
+                    <p style="margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: #0f172a;">${senderName}</p>
+                    <p style="margin: 0 0 4px 0; font-size: 14px; color: #64748b;">Senior Manager - Business Development</p>
+                    <p style="margin: 0; font-size: 14px; font-weight: 700; color: #ea580c;">xMonks</p>
+                  </td>
+                  <td width="50%" valign="top" style="padding-left: 15px; border-left: 1px solid #e2e8f0;">
+                    <table border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="padding-bottom: 8px; font-size: 14px; color: #475569;">
+                          <span style="color: #ea580c; margin-right: 8px;">📞</span> +91-99991-99929
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding-bottom: 8px; font-size: 14px; color: #475569;">
+                          <span style="color: #ea580c; margin-right: 8px;">✉️</span> <a href="mailto:${senderEmail}" style="color: #475569; text-decoration: none;">${senderEmail}</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="font-size: 14px; color: #475569;">
+                          <span style="color: #ea580c; margin-right: 8px;">🌐</span> <a href="https://www.xmonks.com" style="color: #ea580c; text-decoration: none; font-weight: 600;">www.xmonks.com</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 30px; text-align: center;">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center">
+                    <p style="margin: 0 0 16px 0; font-size: 14px; color: #64748b;">
+                      <strong>Included Resource:</strong>
+                    </p>
+                    <a href="https://xmonks.com/REDEFINE%20WHAT%E2%80%99S%20POSSIBLE%20-%20xMonks.pdf" style="display: inline-block; background-color: #ffffff; border: 2px solid #ea580c; color: #ea580c; font-size: 14px; font-weight: 700; text-decoration: none; padding: 12px 24px; border-radius: 6px;">
+                      📄 View PDF Resource
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin-top: 20px;">
+          <tr>
+            <td align="center" style="font-size: 12px; color: #94a3b8; padding: 0 20px;">
+              <p style="margin: 0;">© 2026 xMonks. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+
+    const emailHtml = variation === 'v2' ? emailHtmlV2 : emailHtmlV1;
 
     try {
       // Try Gmail first if configured

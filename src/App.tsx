@@ -43,6 +43,7 @@ export default function App() {
   const [testEmail, setTestEmail] = useState("");
   const [isSendingTest, setIsSendingTest] = useState(false);
   const [showTestInput, setShowTestInput] = useState(false);
+  const [variation, setVariation] = useState<"v1" | "v2">("v1");
 
   // Bulk Sending State
   const [bulkData, setBulkData] = useState<{ name: string; email: string; company?: string }[]>([]);
@@ -109,7 +110,8 @@ export default function App() {
           clientName: nameToUse, 
           clientEmail: emailToUse,
           companyName: companyName || (isTest ? "Test Company" : ""),
-          isTest
+          isTest,
+          variation
         }),
       });
 
@@ -198,6 +200,7 @@ export default function App() {
             clientEmail: client.email,
             companyName: client.company || "",
             isTest: false,
+            variation
           }),
         });
 
@@ -433,6 +436,22 @@ export default function App() {
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none placeholder:text-slate-300"
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="variation" className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-slate-400" />
+                    Email Variation
+                  </label>
+                  <select
+                    id="variation"
+                    value={variation}
+                    onChange={(e) => setVariation(e.target.value as "v1" | "v2")}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all outline-none"
+                  >
+                    <option value="v1">Variation 1 (Standard)</option>
+                    <option value="v2">Variation 2 (Leadership Development)</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -560,6 +579,15 @@ export default function App() {
                     <FileText className="w-5 h-5 text-orange-600" />
                   </div>
                   <div>
+                    <p className="text-sm font-bold text-slate-900">Selected Variation</p>
+                    <p className="text-sm text-slate-500">{variation === "v1" ? "Variation 1 (Standard)" : "Variation 2 (Leadership Development)"}</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                    <FileText className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
                     <p className="text-sm font-bold text-slate-900">Attachment</p>
                     <p className="text-sm text-slate-500">REDEFINE WHAT’S POSSIBLE PDF</p>
                   </div>
@@ -570,7 +598,9 @@ export default function App() {
             <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Key Message</p>
               <p className="text-sm text-slate-600 italic">
-                "We help HR and L&D leaders design leadership journeys that create real, measurable impact."
+                {variation === "v1" 
+                  ? "\"We help HR and L&D leaders design leadership journeys that create real, measurable impact.\""
+                  : "\"Most leadership programs focus on content delivery. The ones that actually shift behaviour do something different; they build the capability to lead, not just the knowledge of it.\""}
               </p>
             </div>
           </motion.div>
@@ -709,41 +739,85 @@ export default function App() {
                   <div className="p-8 sm:p-10 text-slate-700 leading-relaxed space-y-6">
                     <p className="text-lg font-semibold text-slate-900">Hi {clientName ? clientName.split(" ")[0] : "<First Name>"},</p>
                     
-                    <p>I'll keep this brief, I know your inbox is busy.</p>
-                    
-                    <p>
-                      I'm <span className="font-semibold">{senderName.split(' ')[0]}</span> from xMonks. We help HR and L&D leaders at organisations like <span className="font-semibold">Bosch, Flipkart, Tata Steel, and PUMA</span> design leadership journeys that create real, measurable impact.
-                    </p>
+                    {variation === "v1" ? (
+                      <>
+                        <p>I'll keep this brief, I know your inbox is busy.</p>
+                        
+                        <p>
+                          I'm <span className="font-semibold">{senderName.split(' ')[0]}</span> from xMonks. We help HR and L&D leaders at organisations like <span className="font-semibold">Bosch, Flipkart, Tata Steel, and PUMA</span> design leadership journeys that create real, measurable impact.
+                        </p>
 
-                    <div className="bg-orange-50 border-l-4 border-orange-600 p-5 rounded-r-lg">
-                      <p className="text-orange-900 text-sm leading-relaxed">
-                        <span className="font-semibold">What sets us apart</span> is an ecosystem approach that blends globally accredited coach training with customised interventions tailored to your organisation's specific leadership challenges, not a generic framework.
-                      </p>
-                    </div>
+                        <div className="bg-orange-50 border-l-4 border-orange-600 p-5 rounded-r-lg">
+                          <p className="text-orange-900 text-sm leading-relaxed">
+                            <span className="font-semibold">What sets us apart</span> is an ecosystem approach that blends globally accredited coach training with customised interventions tailored to your organisation's specific leadership challenges, not a generic framework.
+                          </p>
+                        </div>
 
-                    <p>
-                      I'd love to explore whether there's a fit with <span className="font-semibold">{companyName || "<Company Name>"}</span>'s leadership agenda. Would you have 30 minutes available this week or next? Happy to work around your schedule.
-                    </p>
+                        <p>
+                          I'd love to explore whether there's a fit with <span className="font-semibold">{companyName || "<Company Name>"}</span>'s leadership agenda. Would you have 30 minutes available this week or next? Happy to work around your schedule.
+                        </p>
 
-                    <div className="text-center pt-4 pb-6">
-                      <a href="https://calendly.com/shubhankar-sethi-xmonks/30min" target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg shadow-sm hover:bg-orange-700 transition-colors">
-                        Let's Connect for 30 Mins
-                      </a>
-                    </div>
+                        <div className="text-center pt-4 pb-6">
+                          <a href="https://calendly.com/shubhankar-sethi-xmonks/30min" target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg shadow-sm hover:bg-orange-700 transition-colors">
+                            Let's Connect for 30 Mins
+                          </a>
+                        </div>
 
-                    <div className="border-t border-slate-200 pt-8 flex flex-col sm:flex-row gap-8">
-                      <div className="flex-1">
-                        <p className="text-slate-500 text-sm mb-2">Warm regards,</p>
-                        <p className="font-bold text-slate-900 text-lg">{senderName}</p>
-                        <p className="text-sm text-slate-500">xMonks Team</p>
-                        <p className="text-sm font-bold text-orange-600 mt-1">xMonks</p>
-                      </div>
-                      <div className="flex-1 sm:border-l border-slate-200 sm:pl-8 space-y-2 text-sm text-slate-600">
-                        <p><span className="text-orange-600 mr-2">📞</span> +91-99991-99929</p>
-                        <p><span className="text-orange-600 mr-2">✉️</span> {senderEmail}</p>
-                        <p><span className="text-orange-600 mr-2">🌐</span> <span className="font-semibold text-orange-600">www.xmonks.com</span></p>
-                      </div>
-                    </div>
+                        <div className="border-t border-slate-200 pt-8 flex flex-col sm:flex-row gap-8">
+                          <div className="flex-1">
+                            <p className="text-slate-500 text-sm mb-2">Warm regards,</p>
+                            <p className="font-bold text-slate-900 text-lg">{senderName}</p>
+                            <p className="text-sm text-slate-500">xMonks Team</p>
+                            <p className="text-sm font-bold text-orange-600 mt-1">xMonks</p>
+                          </div>
+                          <div className="flex-1 sm:border-l border-slate-200 sm:pl-8 space-y-2 text-sm text-slate-600">
+                            <p><span className="text-orange-600 mr-2">📞</span> +91-99991-99929</p>
+                            <p><span className="text-orange-600 mr-2">✉️</span> {senderEmail}</p>
+                            <p><span className="text-orange-600 mr-2">🌐</span> <span className="font-semibold text-orange-600">www.xmonks.com</span></p>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <p>
+                          Most leadership programs focus on content delivery. The ones that actually shift behaviour do something different; they build the capability to lead, not just the knowledge of it.
+                        </p>
+                        
+                        <p>
+                          That's the core of what we do at xMonks. We partner with HR and L&D leaders to design leadership journeys that drive measurable change across teams, not just in the training room.
+                        </p>
+
+                        <div className="bg-orange-50 border-l-4 border-orange-600 p-5 rounded-r-lg">
+                          <p className="text-orange-900 text-sm leading-relaxed">
+                            Organisations like <span className="font-semibold">Bosch, Tata Steel, Flipkart, PUMA, and ICICI Lombard</span> have used our ecosystem approach, combining globally accredited coach training (Erickson, The Leadership Circle, David Clutterbuck/CMI) with bespoke interventions to strengthen leadership capability at scale.
+                          </p>
+                        </div>
+
+                        <p>
+                          I'd love to learn about <span className="font-semibold">{companyName || "<Company Name>"}</span>'s current leadership priorities and share how we might contribute. Would a 20-minute call this week or next work for you?
+                        </p>
+
+                        <div className="text-center pt-4 pb-6">
+                          <a href="https://calendly.com/shubhankar-sethi-xmonks/30min" target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg shadow-sm hover:bg-orange-700 transition-colors">
+                            Let's Connect for 20 Mins
+                          </a>
+                        </div>
+
+                        <div className="border-t border-slate-200 pt-8 flex flex-col sm:flex-row gap-8">
+                          <div className="flex-1">
+                            <p className="text-slate-500 text-sm mb-2">Warm regards,</p>
+                            <p className="font-bold text-slate-900 text-lg">{senderName}</p>
+                            <p className="text-sm text-slate-500">Senior Manager - Business Development</p>
+                            <p className="text-sm font-bold text-orange-600 mt-1">xMonks</p>
+                          </div>
+                          <div className="flex-1 sm:border-l border-slate-200 sm:pl-8 space-y-2 text-sm text-slate-600">
+                            <p><span className="text-orange-600 mr-2">📞</span> +91-99991-99929</p>
+                            <p><span className="text-orange-600 mr-2">✉️</span> {senderEmail}</p>
+                            <p><span className="text-orange-600 mr-2">🌐</span> <span className="font-semibold text-orange-600">www.xmonks.com</span></p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="bg-slate-50 border-t border-slate-200 px-8 py-8 text-center flex flex-col items-center">
